@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Vuelos y Reservas</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sistema de Gestión de Vuelos y Reservas</h1>
+            <nav>
+                <button id="btnHome" class="nav-btn active">Inicio</button>
+                <button id="btnFlights" class="nav-btn">Vuelos</button>
+                <button id="btnReservations" class="nav-btn">Mis Reservas</button>
+                <button id="btnAdmin" class="nav-btn">Administración</button>
+                <button id="btnLogout" class="nav-btn logout">Cerrar Sesión</button>
+            </nav>
+        </header>
+
+        <main>
+            <section id="homeSection" class="section active">
+                <h2>Bienvenido</h2>
+                <p>Selecciona una opción del menú para continuar.</p>
+            </section>
+
+            <section id="flightsSection" class="section">
+                <h2>Vuelos Disponibles</h2>
+                <div id="flightsList" class="flights-grid">
+                    <!-- Los vuelos se cargarán aquí -->
+                </div>
+            </section>
+
+            <section id="reservationsSection" class="section">
+                <h2>Mis Reservas</h2>
+                <div id="reservationsList" class="reservations-list">
+                    <!-- Las reservas se cargarán aquí -->
+                </div>
+            </section>
+
+            <section id="adminSection" class="section">
+                <h2>Panel de Administración</h2>
+                <div class="admin-panel">
+                    <h3>Gestión de Usuarios</h3>
+                    <div id="usersList" class="users-list">
+                        <!-- Los usuarios se cargarán aquí -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Sistema de Gestión de Vuelos y Reservas</p>
+        </footer>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

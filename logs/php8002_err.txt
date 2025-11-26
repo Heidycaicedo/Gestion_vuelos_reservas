@@ -1,0 +1,16 @@
+[Wed Nov 26 17:14:43 2025] PHP 8.2.12 Development Server (http://127.0.0.1:8002) started
+[Wed Nov 26 17:15:21 2025] 127.0.0.1:56082 Accepted
+[Wed Nov 26 17:15:21 2025] 127.0.0.1:56082 Closed without sending a request; it was probably just an unused speculative preconnection
+[Wed Nov 26 17:15:21 2025] 127.0.0.1:56082 Closing
+[Wed Nov 26 17:15:40 2025] 127.0.0.1:56091 Accepted
+[Wed Nov 26 17:15:40 2025] PHP Warning:  Unknown: Failed to open stream: No such file or directory in Unknown on line 0
+[Wed Nov 26 17:15:40 2025] PHP Fatal error:  Failed opening required 'public/index.php' (include_path='C:\xampp\php\PEAR') in Unknown on line 0
+[Wed Nov 26 17:15:40 2025] 127.0.0.1:56091 Closing
+[Wed Nov 26 17:17:42 2025] 127.0.0.1:51166 Accepted
+[Wed Nov 26 17:17:42 2025] PHP Warning:  Unknown: Failed to open stream: No such file or directory in Unknown on line 0
+[Wed Nov 26 17:17:42 2025] PHP Fatal error:  Failed opening required 'public/index.php' (include_path='C:\xampp\php\PEAR') in Unknown on line 0
+[Wed Nov 26 17:17:42 2025] 127.0.0.1:51166 Closing
+[Wed Nov 26 17:17:42 2025] 127.0.0.1:51167 Accepted
+[Wed Nov 26 17:17:42 2025] PHP Warning:  Unknown: Failed to open stream: No such file or directory in Unknown on line 0
+[Wed Nov 26 17:17:42 2025] PHP Fatal error:  Failed opening required 'public/index.php' (include_path='C:\xampp\php\PEAR') in Unknown on line 0
+[Wed Nov 26 17:17:42 2025] 127.0.0.1:51167 Closing
