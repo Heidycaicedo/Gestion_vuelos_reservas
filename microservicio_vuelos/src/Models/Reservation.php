@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Reservation extends Model
 {
-    protected $table = 'reservas';
-    protected $fillable = ['usuario_id', 'vuelo_id', 'numero_asiento', 'estado'];
+    protected $table = 'reservations';
+    protected $fillable = ['user_id', 'flight_id', 'status'];
+    public $timestamps = true;
 }

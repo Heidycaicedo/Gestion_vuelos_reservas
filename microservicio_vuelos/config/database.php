@@ -3,7 +3,7 @@
 return [
     'driver' => 'mysql',
     'host' => 'localhost',
-    'database' => 'gestion_vuelos',
+    'database' => 'vuelos_app',
     'username' => 'root',
     'password' => '',
     'charset' => 'utf8mb4',

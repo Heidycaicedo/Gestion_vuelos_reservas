@@ -6,7 +6,6 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use App\Models\Session;
 
 class AuthMiddleware implements MiddlewareInterface
 {
@@ -39,13 +38,12 @@ class AuthMiddleware implements MiddlewareInterface
                 ->withStatus(401);
         }
 
-        // Validar token (reutilizar modelo del microservicio de usuarios)
-        $session = \Illuminate\Database\Capsule\Manager::table('sesiones')
+        // Validar token - buscar en tabla users
+        $user = \Illuminate\Database\Capsule\Manager::table('users')
             ->where('token', $token)
-            ->where('fecha_expiracion', '>', date('Y-m-d H:i:s'))
             ->first();
 
-        if (!$session) {
+        if (!$user) {
             $response = new \Slim\Psr7\Response();
             $response->getBody()->write(json_encode([
                 'success' => false,
@@ -56,8 +54,8 @@ class AuthMiddleware implements MiddlewareInterface
                 ->withStatus(401);
         }
 
-        // Agregar usuario y token al request
-        $request = $request->withAttribute('usuario_id', $session->usuario_id);
+        // Agregar user_id y token al request
+        $request = $request->withAttribute('user_id', $user->id);
         $request = $request->withAttribute('token', $token);
 
         return $handler->handle($request);

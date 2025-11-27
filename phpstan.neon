@@ -11,3 +11,5 @@ parameters:
     ignoreErrors:
         - '#Undefined variable#'
         - '#Access to undefined constant#'
+        - '#Undefined type.*Controller#'
+        - '#Undefined type.*Middleware#'

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Flight extends Model
 {
-    protected $table = 'vuelos';
-    protected $fillable = ['numero_vuelo', 'nave_id', 'origen', 'destino', 'fecha_salida', 'fecha_llegada', 'asientos_disponibles'];
+    protected $table = 'flights';
+    protected $fillable = ['nave_id', 'origin', 'destination', 'departure', 'arrival', 'price'];
+    public $timestamps = true;
 }

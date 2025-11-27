@@ -7,5 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Aircraft extends Model
 {
     protected $table = 'naves';
-    protected $fillable = ['modelo', 'capacidad', 'matricula'];
+    protected $fillable = ['name', 'capacity', 'model'];
+    public $timestamps = true;
 }

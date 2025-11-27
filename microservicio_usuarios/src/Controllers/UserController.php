@@ -66,23 +66,35 @@ class UserController
             $user = User::find($args['id']);
 
             if (!$user) {
-                $response->getBody()->write(json_encode(['success' => false, 'error' => 'Usuario no encontrado']));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+                return $this->errorResponse($response, 'Usuario no encontrado', 404);
             }
 
-            if (empty($data['rol'])) {
-                $response->getBody()->write(json_encode(['success' => false, 'error' => 'Rol requerido']));
-                return $response->withHeader('Content-Type', 'application/json')->withStatus(400);
+            if (empty($data['role'])) {
+                return $this->errorResponse($response, 'Rol requerido', 400);
             }
 
-            $user->rol = $data['rol'];
+            if (!in_array($data['role'], ['administrador', 'gestor'])) {
+                return $this->errorResponse($response, 'Rol inválido', 400);
+            }
+
+            $user->role = $data['role'];
             $user->save();
 
-            $response->getBody()->write(json_encode(['success' => true, 'data' => $user]));
-            return $response->withHeader('Content-Type', 'application/json');
+            return $this->successResponse($response, $user);
         } catch (\Exception $e) {
-            $response->getBody()->write(json_encode(['success' => false, 'error' => $e->getMessage()]));
-            return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+            return $this->errorResponse($response, 'Error al actualizar rol', 500);
         }
+    }
+
+    private function successResponse(Response $response, $data, $statusCode = 200)
+    {
+        $response->getBody()->write(json_encode(['success' => true, 'data' => $data]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($statusCode);
+    }
+
+    private function errorResponse(Response $response, $message, $statusCode = 400)
+    {
+        $response->getBody()->write(json_encode(['success' => false, 'error' => $message]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus($statusCode);
     }
 }

@@ -6,7 +6,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use App\Models\Session;
+use App\Models\User;
 
 class AuthMiddleware implements MiddlewareInterface
 {
@@ -39,12 +39,10 @@ class AuthMiddleware implements MiddlewareInterface
                 ->withStatus(401);
         }
 
-        // Validar token
-        $session = Session::where('token', $token)
-            ->where('fecha_expiracion', '>', date('Y-m-d H:i:s'))
-            ->first();
+        // Validar token - buscar en tabla users
+        $user = User::where('token', $token)->first();
 
-        if (!$session) {
+        if (!$user) {
             $response = new \Slim\Psr7\Response();
             $response->getBody()->write(json_encode([
                 'success' => false,
@@ -55,8 +53,8 @@ class AuthMiddleware implements MiddlewareInterface
                 ->withStatus(401);
         }
 
-        // Agregar usuario y token al request para uso posterior
-        $request = $request->withAttribute('usuario_id', $session->usuario_id);
+        // Agregar usuario_id y token al request para uso posterior
+        $request = $request->withAttribute('user_id', $user->id);
         $request = $request->withAttribute('token', $token);
 
         return $handler->handle($request);

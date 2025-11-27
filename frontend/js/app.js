@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Cargar rol del usuario
-    const userRole = Auth.getRol();
+    const userRole = Auth.getRole();
     const adminBtn = document.getElementById('btnAdmin');
 
     // Mostrar/ocultar botón de admin según rol
@@ -15,40 +15,49 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Navegación
-    document.getElementById('btnHome').addEventListener('click', () => showSection('homeSection'));
-    document.getElementById('btnFlights').addEventListener('click', () => {
-        showSection('flightsSection');
+    document.getElementById('btnHome').addEventListener('click', (e) => showSection('homeSection', e));
+    document.getElementById('btnFlights').addEventListener('click', (e) => {
+        showSection('flightsSection', e);
         loadFlights();
     });
-    document.getElementById('btnReservations').addEventListener('click', () => {
-        showSection('reservationsSection');
+    document.getElementById('btnReservations').addEventListener('click', (e) => {
+        showSection('reservationsSection', e);
         loadReservations();
     });
-    document.getElementById('btnAdmin').addEventListener('click', () => {
+    document.getElementById('btnAdmin').addEventListener('click', (e) => {
         // Verificar permisos de admin
         if (userRole !== 'administrador') {
             alert('No tienes permiso para acceder al panel de administración');
             return;
         }
-        showSection('adminSection');
+        showSection('adminSection', e);
         loadUsers();
     });
     document.getElementById('btnLogout').addEventListener('click', logout);
 
-    function showSection(sectionId) {
+    function showSection(sectionId, event) {
+        if (event) event.preventDefault();
+        
         // Ocultar todas las secciones
         document.querySelectorAll('.section').forEach(section => {
             section.classList.remove('active');
         });
 
         // Mostrar la sección seleccionada
-        document.getElementById(sectionId).classList.add('active');
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
+        }
 
         // Actualizar botones de navegación
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        event.target.classList.add('active');
+        
+        // Marcar el botón activo si el evento existe
+        if (event && event.target) {
+            event.target.classList.add('active');
+        }
     }
 
     async function loadFlights() {
@@ -68,22 +77,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 flightsList.innerHTML = flights.map(flight => `
                     <div class="flight-card">
-                        <h3>Vuelo ${flight.numero_vuelo}</h3>
+                        <h3>Vuelo #${flight.id}</h3>
                         <div class="flight-info">
                             <label>Origen:</label>
-                            <span>${flight.origen}</span>
+                            <span>${flight.origin}</span>
                         </div>
                         <div class="flight-info">
                             <label>Destino:</label>
-                            <span>${flight.destino}</span>
+                            <span>${flight.destination}</span>
                         </div>
                         <div class="flight-info">
                             <label>Salida:</label>
-                            <span>${flight.fecha_salida}</span>
+                            <span>${flight.departure}</span>
                         </div>
                         <div class="flight-info">
-                            <label>Asientos disponibles:</label>
-                            <span>${flight.asientos_disponibles}</span>
+                            <label>Precio:</label>
+                            <span>$${flight.price}</span>
                         </div>
                         <button onclick="reserveFlight(${flight.id})" class="btn-submit" style="margin-top: 10px;">
                             Reservar
@@ -118,9 +127,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 reservationsList.innerHTML = reservations.map(reservation => `
                     <div class="reservation-item">
                         <div>
-                            <p><strong>Vuelo ID:</strong> ${reservation.vuelo_id}</p>
-                            <p><strong>Asiento:</strong> ${reservation.numero_asiento}</p>
-                            <p><strong>Estado:</strong> ${reservation.estado}</p>
+                            <p><strong>Vuelo ID:</strong> ${reservation.flight_id}</p>
+                            <p><strong>Estado:</strong> ${reservation.status}</p>
+                            <p><strong>Reserva:</strong> ${reservation.reserved_at}</p>
                         </div>
                         <button onclick="cancelReservation(${reservation.id})" class="btn-submit" style="background-color: #d9534f;">
                             Cancelar
@@ -155,12 +164,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 usersList.innerHTML = users.map(user => `
                     <div class="user-item">
                         <div>
-                            <p><strong>${user.nombre}</strong></p>
+                            <p><strong>${user.name}</strong></p>
                             <p>${user.email}</p>
-                            <p>Rol: <strong>${user.rol}</strong></p>
+                            <p>Rol: <strong>${user.role}</strong></p>
                         </div>
                         <div>
-                            <button onclick="changeUserRole(${user.id}, '${user.rol}')" class="btn-submit" style="width: auto;">
+                            <button onclick="changeUserRole(${user.id}, '${user.role}')" class="btn-submit" style="width: auto;">
                                 Cambiar Rol
                             </button>
                         </div>
@@ -184,19 +193,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Funciones globales para eventos
     window.reserveFlight = function(flightId) {
-        const numeroAsiento = prompt('Ingresa el número de asiento (ej: 12A):');
-        
-        if (!numeroAsiento) {
-            alert('Debes ingresar un número de asiento');
-            return;
+        if (confirm('¿Deseas reservar este vuelo?')) {
+            realizarReserva(flightId);
         }
-
-        realizarReserva(flightId, numeroAsiento);
     };
 
-    async function realizarReserva(flightId, numeroAsiento) {
+    async function realizarReserva(flightId) {
         try {
-            const response = await Reservations.create(flightId, numeroAsiento);
+            const response = await Reservations.create(flightId);
 
             if (response.success) {
                 alert('Reserva realizada exitosamente');

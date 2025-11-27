@@ -38,33 +38,33 @@ $errorMiddleware->setDefaultErrorHandler($defaultErrorHandler);
 $errorMiddleware->setErrorHandler(Slim\Exception\HttpNotFoundException::class, $notFoundHandler);
 
 // Rutas Públicas para listar vuelos
-$app->get('/api/vuelos', \App\Controllers\FlightController::class . ':list');
+$app->get('/api/flights', \App\Controllers\FlightController::class . ':list');
 
 // Rutas Protegidas
 $app->group('', function ($app) {
     // Rutas protegidas para gestores
     $app->group('', function ($app) {
-        $app->post('/api/reservas', \App\Controllers\ReservationController::class . ':create');
-        $app->delete('/api/reservas/{id}', \App\Controllers\ReservationController::class . ':cancel');
+        $app->post('/api/reservations', \App\Controllers\ReservationController::class . ':create');
+        $app->delete('/api/reservations/{id}', \App\Controllers\ReservationController::class . ':cancel');
     })->add(\App\Middleware\GestorMiddleware::class);
 
     // Rutas solo para Administrador
     $app->group('', function ($app) {
-        $app->get('/api/vuelos/{id}', \App\Controllers\FlightController::class . ':show');
-        $app->post('/api/vuelos', \App\Controllers\FlightController::class . ':create');
-        $app->put('/api/vuelos/{id}', \App\Controllers\FlightController::class . ':update');
-        $app->delete('/api/vuelos/{id}', \App\Controllers\FlightController::class . ':delete');
+        $app->get('/api/flights/{id}', \App\Controllers\FlightController::class . ':show');
+        $app->post('/api/flights', \App\Controllers\FlightController::class . ':create');
+        $app->put('/api/flights/{id}', \App\Controllers\FlightController::class . ':update');
+        $app->delete('/api/flights/{id}', \App\Controllers\FlightController::class . ':delete');
 
-        $app->get('/api/naves', \App\Controllers\AircraftController::class . ':list');
-        $app->get('/api/naves/{id}', \App\Controllers\AircraftController::class . ':show');
-        $app->post('/api/naves', \App\Controllers\AircraftController::class . ':create');
-        $app->put('/api/naves/{id}', \App\Controllers\AircraftController::class . ':update');
-        $app->delete('/api/naves/{id}', \App\Controllers\AircraftController::class . ':delete');
+        $app->get('/api/aircraft', \App\Controllers\AircraftController::class . ':list');
+        $app->get('/api/aircraft/{id}', \App\Controllers\AircraftController::class . ':show');
+        $app->post('/api/aircraft', \App\Controllers\AircraftController::class . ':create');
+        $app->put('/api/aircraft/{id}', \App\Controllers\AircraftController::class . ':update');
+        $app->delete('/api/aircraft/{id}', \App\Controllers\AircraftController::class . ':delete');
     })->add(\App\Middleware\AdminMiddleware::class);
 
     // Reservas - Listar con autenticación
-    $app->get('/api/reservas', \App\Controllers\ReservationController::class . ':list');
-    $app->get('/api/reservas/usuario/{id}', \App\Controllers\ReservationController::class . ':listByUser');
+    $app->get('/api/reservations', \App\Controllers\ReservationController::class . ':list');
+    $app->get('/api/reservations/user/{id}', \App\Controllers\ReservationController::class . ':listByUser');
 })->add(\App\Middleware\AuthMiddleware::class);
 
 $app->run();

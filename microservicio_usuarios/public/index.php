@@ -2,6 +2,12 @@
 
 use Slim\Factory\AppFactory;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use App\Controllers\AuthController;
+use App\Controllers\UserController;
+use App\Middleware\AuthMiddleware;
+use App\Middleware\AdminMiddleware;
+use Psr\Http\Message\RequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -36,21 +42,45 @@ $errorMiddleware->setDefaultErrorHandler($defaultErrorHandler);
 $errorMiddleware->setErrorHandler(Slim\Exception\HttpNotFoundException::class, $notFoundHandler);
 
 // Rutas Públicas
-$app->post('/api/usuarios/registrar', \App\Controllers\AuthController::class . ':register');
-$app->post('/api/usuarios/login', \App\Controllers\AuthController::class . ':login');
+$app->post('/api/auth/register', function (Request $request, Response $response) {
+    $controller = new AuthController();
+    return $controller->register($request, $response);
+});
+$app->post('/api/auth/login', function (Request $request, Response $response) {
+    $controller = new AuthController();
+    return $controller->login($request, $response);
+});
 
 // Rutas Protegidas
 $app->group('', function ($app) {
-    $app->post('/api/usuarios/logout', \App\Controllers\AuthController::class . ':logout');
-    $app->post('/api/usuarios/validar-token', \App\Controllers\AuthController::class . ':validateToken');
+    $app->post('/api/auth/logout', function (Request $request, Response $response) {
+        $controller = new AuthController();
+        return $controller->logout($request, $response);
+    });
+    $app->post('/api/auth/validate', function (Request $request, Response $response) {
+        $controller = new AuthController();
+        return $controller->validateToken($request, $response);
+    });
     
     // Rutas solo para Administrador
     $app->group('', function ($app) {
-        $app->get('/api/usuarios', \App\Controllers\UserController::class . ':list');
-        $app->get('/api/usuarios/{id}', \App\Controllers\UserController::class . ':show');
-        $app->put('/api/usuarios/{id}', \App\Controllers\UserController::class . ':update');
-        $app->put('/api/usuarios/{id}/rol', \App\Controllers\UserController::class . ':updateRole');
-    })->add(\App\Middleware\AdminMiddleware::class);
-})->add(\App\Middleware\AuthMiddleware::class);
+        $app->get('/api/users', function (Request $request, Response $response) {
+            $controller = new UserController();
+            return $controller->list($request, $response);
+        });
+        $app->get('/api/users/{id}', function (Request $request, Response $response, array $args) {
+            $controller = new UserController();
+            return $controller->show($request, $response, $args);
+        });
+        $app->put('/api/users/{id}', function (Request $request, Response $response, array $args) {
+            $controller = new UserController();
+            return $controller->update($request, $response, $args);
+        });
+        $app->put('/api/users/{id}/role', function (Request $request, Response $response, array $args) {
+            $controller = new UserController();
+            return $controller->updateRole($request, $response, $args);
+        });
+    })->add(new AdminMiddleware());
+})->add(new AuthMiddleware());
 
 $app->run();

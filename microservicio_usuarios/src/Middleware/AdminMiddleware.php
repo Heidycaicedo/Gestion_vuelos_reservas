@@ -12,9 +12,9 @@ class AdminMiddleware implements MiddlewareInterface
 {
     public function process(Request $request, RequestHandler $handler): Response
     {
-        $usuario_id = $request->getAttribute('usuario_id');
+        $user_id = $request->getAttribute('user_id');
 
-        if (!$usuario_id) {
+        if (!$user_id) {
             $response = new \Slim\Psr7\Response();
             $response->getBody()->write(json_encode([
                 'success' => false,
@@ -25,9 +25,9 @@ class AdminMiddleware implements MiddlewareInterface
                 ->withStatus(403);
         }
 
-        $user = User::find($usuario_id);
+        $user = User::find($user_id);
 
-        if (!$user || $user->rol !== 'administrador') {
+        if (!$user || $user->role !== 'administrador') {
             $response = new \Slim\Psr7\Response();
             $response->getBody()->write(json_encode([
                 'success' => false,

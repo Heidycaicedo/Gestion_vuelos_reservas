@@ -5,7 +5,6 @@ namespace App\Controllers;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Models\User;
-use App\Models\Session;
 
 class AuthController
 {
@@ -14,22 +13,25 @@ class AuthController
         try {
             $data = json_decode($request->getBody(), true);
 
-            // Validar datos
-            if (empty($data['email']) || empty($data['password']) || empty($data['nombre'])) {
-                return $this->errorResponse($response, 'Datos incompletos', 400);
+            if (empty($data['name']) || empty($data['email']) || empty($data['password'])) {
+                return $this->errorResponse($response, 'Nombre, correo y contraseña son requeridos', 400);
             }
 
-            // Crear usuario
+            $existingUser = User::where('email', $data['email'])->first();
+            if ($existingUser) {
+                return $this->errorResponse($response, 'El correo ya está registrado', 409);
+            }
+
             $user = User::create([
-                'nombre' => $data['nombre'],
+                'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => password_hash($data['password'], PASSWORD_BCRYPT),
-                'rol' => $data['rol'] ?? 'gestor',
+                'role' => $data['role'] ?? 'gestor',
             ]);
 
-            return $this->successResponse($response, ['usuario_id' => $user->id], 201);
+            return $this->successResponse($response, ['user_id' => $user->id, 'message' => 'Usuario registrado exitosamente'], 201);
         } catch (\Exception $e) {
-            return $this->errorResponse($response, $e->getMessage(), 500);
+            return $this->errorResponse($response, 'Error interno del servidor', 500);
         }
     }
 
@@ -39,31 +41,27 @@ class AuthController
             $data = json_decode($request->getBody(), true);
 
             if (empty($data['email']) || empty($data['password'])) {
-                return $this->errorResponse($response, 'Email y contraseña requeridos', 400);
+                return $this->errorResponse($response, 'Correo y contraseña son requeridos', 400);
             }
 
             $user = User::where('email', $data['email'])->first();
 
             if (!$user || !password_verify($data['password'], $user->password)) {
-                return $this->errorResponse($response, 'Credenciales inválidas', 401);
+                return $this->errorResponse($response, 'Correo o contraseña inválidos', 401);
             }
 
-            // Generar token
             $token = bin2hex(random_bytes(32));
-
-            Session::create([
-                'usuario_id' => $user->id,
-                'token' => $token,
-                'fecha_expiracion' => date('Y-m-d H:i:s', strtotime('+24 hours')),
-            ]);
+            $user->token = $token;
+            $user->save();
 
             return $this->successResponse($response, [
                 'token' => $token,
-                'usuario_id' => $user->id,
-                'rol' => $user->rol,
+                'user_id' => $user->id,
+                'role' => $user->role,
+                'message' => 'Inicio de sesión exitoso',
             ]);
         } catch (\Exception $e) {
-            return $this->errorResponse($response, $e->getMessage(), 500);
+            return $this->errorResponse($response, 'Error interno del servidor', 500);
         }
     }
 
@@ -77,11 +75,15 @@ class AuthController
                 return $this->errorResponse($response, 'Token requerido', 400);
             }
 
-            Session::where('token', $token)->delete();
+            $user = User::where('token', $token)->first();
+            if ($user) {
+                $user->token = null;
+                $user->save();
+            }
 
-            return $this->successResponse($response, ['mensaje' => 'Sesión cerrada']);
+            return $this->successResponse($response, ['message' => 'Sesión cerrada correctamente']);
         } catch (\Exception $e) {
-            return $this->errorResponse($response, $e->getMessage(), 500);
+            return $this->errorResponse($response, 'Error interno del servidor', 500);
         }
     }
 
@@ -95,22 +97,18 @@ class AuthController
                 return $this->errorResponse($response, 'Token requerido', 400);
             }
 
-            $session = Session::where('token', $token)
-                ->where('fecha_expiracion', '>', date('Y-m-d H:i:s'))
-                ->first();
+            $user = User::where('token', $token)->first();
 
-            if (!$session) {
+            if (!$user) {
                 return $this->errorResponse($response, 'Token inválido o expirado', 401);
             }
 
-            $user = User::find($session->usuario_id);
-
             return $this->successResponse($response, [
-                'usuario_id' => $user->id,
-                'rol' => $user->rol,
+                'user_id' => $user->id,
+                'role' => $user->role,
             ]);
         } catch (\Exception $e) {
-            return $this->errorResponse($response, $e->getMessage(), 500);
+            return $this->errorResponse($response, 'Error interno del servidor', 500);
         }
     }
 

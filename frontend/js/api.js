@@ -1,6 +1,6 @@
 // Configuración de URLs de los microservicios
-const API_USUARIOS = 'http://localhost/Gestion_vuelos_reservas/microservicio_usuarios/public';
-const API_VUELOS = 'http://localhost/Gestion_vuelos_reservas/microservicio_vuelos/public';
+const API_USUARIOS = 'http://localhost:8001';
+const API_VUELOS = 'http://localhost:8002';
 
 // Funciones auxiliares para hacer requests
 async function request(url, method = 'GET', data = null) {
@@ -46,43 +46,43 @@ async function request(url, method = 'GET', data = null) {
 
 // Autenticación
 const Auth = {
-    async register(nombre, email, password) {
-        return request(`${API_USUARIOS}/api/usuarios/registrar`, 'POST', {
-            nombre,
+    async register(name, email, password) {
+        return request(`${API_USUARIOS}/api/auth/register`, 'POST', {
+            name,
             email,
             password,
         });
     },
 
     async login(email, password) {
-        const response = await request(`${API_USUARIOS}/api/usuarios/login`, 'POST', {
+        const response = await request(`${API_USUARIOS}/api/auth/login`, 'POST', {
             email,
             password,
         });
 
         if (response.success) {
             localStorage.setItem('token', response.data.data.token);
-            localStorage.setItem('usuario_id', response.data.data.usuario_id);
-            localStorage.setItem('rol', response.data.data.rol);
+            localStorage.setItem('user_id', response.data.data.user_id);
+            localStorage.setItem('role', response.data.data.role);
         }
 
         return response;
     },
 
     async logout(token) {
-        const response = await request(`${API_USUARIOS}/api/usuarios/logout`, 'POST', { token });
+        const response = await request(`${API_USUARIOS}/api/auth/logout`, 'POST', { token });
 
         if (response.success) {
             localStorage.removeItem('token');
-            localStorage.removeItem('usuario_id');
-            localStorage.removeItem('rol');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('role');
         }
 
         return response;
     },
 
     async validateToken(token) {
-        return request(`${API_USUARIOS}/api/usuarios/validar-token`, 'POST', { token });
+        return request(`${API_USUARIOS}/api/auth/validate`, 'POST', { token });
     },
 
     getToken() {
@@ -90,11 +90,11 @@ const Auth = {
     },
 
     getUserId() {
-        return localStorage.getItem('usuario_id');
+        return localStorage.getItem('user_id');
     },
 
-    getRol() {
-        return localStorage.getItem('rol');
+    getRole() {
+        return localStorage.getItem('role');
     },
 
     isAuthenticated() {
@@ -105,34 +105,31 @@ const Auth = {
 // Gestión de Usuarios
 const Users = {
     async list() {
-        return request(`${API_USUARIOS}/api/usuarios`, 'GET');
+        return request(`${API_USUARIOS}/api/users`, 'GET');
     },
 
     async getById(id) {
-        return request(`${API_USUARIOS}/api/usuarios/${id}`, 'GET');
+        return request(`${API_USUARIOS}/api/users/${id}`, 'GET');
     },
 
     async update(id, data) {
-        return request(`${API_USUARIOS}/api/usuarios/${id}`, 'PUT', data);
+        return request(`${API_USUARIOS}/api/users/${id}`, 'PUT', data);
     },
 
-    async updateRole(id, rol) {
-        return request(`${API_USUARIOS}/api/usuarios/${id}/rol`, 'PUT', { rol });
+    async updateRole(id, role) {
+        return request(`${API_USUARIOS}/api/users/${id}/role`, 'PUT', { role });
     },
 };
 
 // Gestión de Vuelos
 const Flights = {
     async list(filtros = {}) {
-        let url = `${API_VUELOS}/api/vuelos`;
+        let url = `${API_VUELOS}/api/flights`;
         const params = new URLSearchParams();
 
-        // 2.3 Soporte para búsqueda por origen, destino y fecha
-        if (filtros.origen) params.append('origen', filtros.origen);
-        if (filtros.destino) params.append('destino', filtros.destino);
-        if (filtros.fecha) params.append('fecha', filtros.fecha);
-        if (filtros.fecha_desde) params.append('fecha_desde', filtros.fecha_desde);
-        if (filtros.fecha_hasta) params.append('fecha_hasta', filtros.fecha_hasta);
+        if (filtros.origin) params.append('origin', filtros.origin);
+        if (filtros.destination) params.append('destination', filtros.destination);
+        if (filtros.departure) params.append('departure', filtros.departure);
 
         if (params.toString()) {
             url += '?' + params.toString();
@@ -141,76 +138,71 @@ const Flights = {
         return request(url, 'GET');
     },
 
-    async search(origen = null, destino = null, fecha = null) {
-        return this.list({ origen, destino, fecha });
-    },
-
-    async searchByDateRange(fecha_desde, fecha_hasta) {
-        return this.list({ fecha_desde, fecha_hasta });
+    async search(origin = null, destination = null, departure = null) {
+        return this.list({ origin, destination, departure });
     },
 
     async getById(id) {
-        return request(`${API_VUELOS}/api/vuelos/${id}`, 'GET');
+        return request(`${API_VUELOS}/api/flights/${id}`, 'GET');
     },
 
     async create(data) {
-        return request(`${API_VUELOS}/api/vuelos`, 'POST', data);
+        return request(`${API_VUELOS}/api/flights`, 'POST', data);
     },
 
     async update(id, data) {
-        return request(`${API_VUELOS}/api/vuelos/${id}`, 'PUT', data);
+        return request(`${API_VUELOS}/api/flights/${id}`, 'PUT', data);
     },
 
     async delete(id) {
-        return request(`${API_VUELOS}/api/vuelos/${id}`, 'DELETE');
+        return request(`${API_VUELOS}/api/flights/${id}`, 'DELETE');
     },
 };
 
 // Gestión de Naves
 const Aircraft = {
     async list() {
-        return request(`${API_VUELOS}/api/naves`, 'GET');
+        return request(`${API_VUELOS}/api/aircraft`, 'GET');
     },
 
     async getById(id) {
-        return request(`${API_VUELOS}/api/naves/${id}`, 'GET');
+        return request(`${API_VUELOS}/api/aircraft/${id}`, 'GET');
     },
 
-    async create(modelo, capacidad, matricula) {
-        return request(`${API_VUELOS}/api/naves`, 'POST', {
-            modelo,
-            capacidad,
-            matricula
+    async create(name, capacity, model) {
+        return request(`${API_VUELOS}/api/aircraft`, 'POST', {
+            name,
+            capacity,
+            model
         });
     },
 
     async update(id, data) {
-        return request(`${API_VUELOS}/api/naves/${id}`, 'PUT', data);
+        return request(`${API_VUELOS}/api/aircraft/${id}`, 'PUT', data);
     },
 
     async delete(id) {
-        return request(`${API_VUELOS}/api/naves/${id}`, 'DELETE');
+        return request(`${API_VUELOS}/api/aircraft/${id}`, 'DELETE');
     },
 };
 
 // Gestión de Reservas
 const Reservations = {
-    async list(usuarioId = null) {
-        let url = `${API_VUELOS}/api/reservas`;
-        if (usuarioId) {
-            url += `?usuario_id=${usuarioId}`;
+    async list(userId = null) {
+        let url = `${API_VUELOS}/api/reservations`;
+        if (userId) {
+            url += `?user_id=${userId}`;
         }
         return request(url, 'GET');
     },
 
-    async create(vuoloId, numeroAsiento) {
-        return request(`${API_VUELOS}/api/reservas`, 'POST', {
-            vuelo_id: vuoloId,
-            numero_asiento: numeroAsiento,
+    async create(flightId) {
+        return request(`${API_VUELOS}/api/reservations`, 'POST', {
+            flight_id: flightId,
         });
     },
 
     async cancel(id) {
-        return request(`${API_VUELOS}/api/reservas/${id}`, 'DELETE');
+        return request(`${API_VUELOS}/api/reservations/${id}`, 'DELETE');
     },
 };
