@@ -8,9 +8,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cargar rol del usuario
     const userRole = Auth.getRole();
     const adminBtn = document.getElementById('btnAdmin');
+    const isAdmin = userRole === 'administrador';
+    const isGestor = userRole === 'gestor' || isAdmin;
 
     // Mostrar/ocultar botón de admin según rol
-    if (userRole !== 'administrador') {
+    if (!isAdmin) {
         adminBtn.style.display = 'none';
     }
 
@@ -94,9 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <label>Precio:</label>
                             <span>$${flight.price}</span>
                         </div>
-                        <button onclick="reserveFlight(${flight.id})" class="btn-submit" style="margin-top: 10px;">
-                            Reservar
-                        </button>
+                        ${isGestor ? `<button onclick="reserveFlight(${flight.id})" class="btn-submit" style="margin-top: 10px;">Reservar</button>` : ''}
                     </div>
                 `).join('');
             } else if (response.status === 403) {
@@ -131,9 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <p><strong>Estado:</strong> ${reservation.status}</p>
                             <p><strong>Reserva:</strong> ${reservation.reserved_at}</p>
                         </div>
-                        <button onclick="cancelReservation(${reservation.id})" class="btn-submit" style="background-color: #d9534f;">
-                            Cancelar
-                        </button>
+                        ${isGestor ? `<button onclick="cancelReservation(${reservation.id})" class="btn-submit" style="background-color: #d9534f;">Cancelar</button>` : ''}
                     </div>
                 `).join('');
             } else if (response.status === 403) {
@@ -169,9 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <p>Rol: <strong>${user.role}</strong></p>
                         </div>
                         <div>
-                            <button onclick="changeUserRole(${user.id}, '${user.role}')" class="btn-submit" style="width: auto;">
-                                Cambiar Rol
-                            </button>
+                            ${isAdmin ? `<button onclick="changeUserRole(${user.id}, '${user.role}')" class="btn-submit" style="width: auto;">Cambiar Rol</button>` : ''}
                         </div>
                     </div>
                 `).join('');
@@ -244,10 +240,27 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    window.changeUserRole = function(userId, currentRole) {
+    window.changeUserRole = async function(userId, currentRole) {
+        if (!isAdmin) {
+            alert('No tienes permisos para cambiar roles');
+            return;
+        }
+
         const newRole = currentRole === 'administrador' ? 'gestor' : 'administrador';
-        if (confirm(`¿Cambiar rol a ${newRole}?`)) {
-            alert(`Cambiar rol del usuario ${userId} a ${newRole} - Funcionalidad en desarrollo`);
+        if (!confirm(`¿Cambiar rol a ${newRole}?`)) return;
+
+        try {
+            const response = await Users.updateRole(userId, newRole);
+            if (response.success) {
+                alert('Rol actualizado correctamente');
+                loadUsers();
+            } else if (response.status === 403) {
+                alert('Acceso denegado. No tienes permiso para cambiar roles');
+            } else {
+                alert('Error al cambiar rol: ' + (response.data?.error || response.error || 'Desconocido'));
+            }
+        } catch (e) {
+            alert('Error de conexión al cambiar rol');
         }
     };
 

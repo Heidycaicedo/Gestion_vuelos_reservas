@@ -31,6 +31,7 @@ class AuthController
 
             return $this->successResponse($response, ['user_id' => $user->id, 'message' => 'Usuario registrado exitosamente'], 201);
         } catch (\Exception $e) {
+            error_log('Register error: ' . $e->getMessage() . ' | File: ' . $e->getFile() . ':' . $e->getLine());
             return $this->errorResponse($response, 'Error interno del servidor', 500);
         }
     }
@@ -61,6 +62,7 @@ class AuthController
                 'message' => 'Inicio de sesión exitoso',
             ]);
         } catch (\Exception $e) {
+            error_log('Login error: ' . $e->getMessage() . ' | File: ' . $e->getFile() . ':' . $e->getLine());
             return $this->errorResponse($response, 'Error interno del servidor', 500);
         }
     }
@@ -83,6 +85,7 @@ class AuthController
 
             return $this->successResponse($response, ['message' => 'Sesión cerrada correctamente']);
         } catch (\Exception $e) {
+            error_log('Logout error: ' . $e->getMessage() . ' | File: ' . $e->getFile() . ':' . $e->getLine());
             return $this->errorResponse($response, 'Error interno del servidor', 500);
         }
     }
@@ -108,6 +111,7 @@ class AuthController
                 'role' => $user->role,
             ]);
         } catch (\Exception $e) {
+            error_log('ValidateToken error: ' . $e->getMessage() . ' | File: ' . $e->getFile() . ':' . $e->getLine());
             return $this->errorResponse($response, 'Error interno del servidor', 500);
         }
     }

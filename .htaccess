@@ -1,0 +1,27 @@
+# Disable directory listing and serve frontend index
+Options -Indexes
+
+# Prefer frontend/index.html as DirectoryIndex
+DirectoryIndex frontend/index.html index.php
+
+RewriteEngine On
+# Ensure rules work when site is served from a subdirectory
+RewriteBase /gestion_vuelos_reservas/
+# If request is exactly the directory root, redirect to the frontend folder
+RewriteCond %{REQUEST_URI} ^/$
+RewriteRule ^$ frontend/ [R=302,L]
+
+# If the requested path does not map to an existing file or directory,
+# and it is not already under /frontend/, internally rewrite it to /frontend/<path>
+# This lets URLs like /login.html -> /frontend/login.html without exposing redirects.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/frontend/
+RewriteRule ^(.*)$ frontend/$1 [L]
+
+# Handle OPTIONS for CORS preflight (development convenience)
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>

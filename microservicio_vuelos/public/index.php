@@ -2,6 +2,7 @@
 
 use Slim\Factory\AppFactory;
 use Illuminate\Database\Capsule\Manager as Capsule;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -14,6 +15,24 @@ $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
 $app = AppFactory::create();
+
+// CORS middleware (development convenience)
+$app->add(function ($request, RequestHandler $handler) {
+    if (strtoupper($request->getMethod()) === 'OPTIONS') {
+        $resp = new \Slim\Psr7\Response();
+        return $resp
+            ->withHeader('Access-Control-Allow-Origin', '*')
+            ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            ->withStatus(200);
+    }
+
+    $response = $handler->handle($request);
+    return $response
+        ->withHeader('Access-Control-Allow-Origin', '*')
+        ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+});
 
 // Añadir middleware de manejo de errores con mensajes en español
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);

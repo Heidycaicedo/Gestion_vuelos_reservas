@@ -8,6 +8,7 @@ use App\Middleware\AuthMiddleware;
 use App\Middleware\AdminMiddleware;
 use Psr\Http\Message\RequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -20,6 +21,24 @@ $capsule->setAsGlobal();
 $capsule->bootEloquent();
 
 $app = AppFactory::create();
+// CORS middleware (development convenience)
+$app->add(function (Request $request, RequestHandler $handler) {
+    // Handle preflight
+    if (strtoupper($request->getMethod()) === 'OPTIONS') {
+        $resp = new \Slim\Psr7\Response();
+        return $resp
+            ->withHeader('Access-Control-Allow-Origin', '*')
+            ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+            ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            ->withStatus(200);
+    }
+
+    $response = $handler->handle($request);
+    return $response
+        ->withHeader('Access-Control-Allow-Origin', '*')
+        ->withHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+});
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
 // Controlador por defecto de errores (500) en español
@@ -42,13 +61,15 @@ $errorMiddleware->setDefaultErrorHandler($defaultErrorHandler);
 $errorMiddleware->setErrorHandler(Slim\Exception\HttpNotFoundException::class, $notFoundHandler);
 
 // Rutas Públicas
-$app->post('/api/auth/register', function (Request $request, Response $response) {
-    $controller = new AuthController();
-    return $controller->register($request, $response);
-});
 $app->post('/api/auth/login', function (Request $request, Response $response) {
     $controller = new AuthController();
     return $controller->login($request, $response);
+});
+
+// Registro público (según requisito: registro debe ser público)
+$app->post('/api/auth/register', function (Request $request, Response $response) {
+    $controller = new AuthController();
+    return $controller->register($request, $response);
 });
 
 // Rutas Protegidas

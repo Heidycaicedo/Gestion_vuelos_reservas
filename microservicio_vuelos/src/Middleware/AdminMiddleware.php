@@ -11,9 +11,9 @@ class AdminMiddleware implements MiddlewareInterface
 {
     public function process(Request $request, RequestHandler $handler): Response
     {
-        $usuario_id = $request->getAttribute('usuario_id');
+        $user_id = $request->getAttribute('user_id');
 
-        if (!$usuario_id) {
+        if (!$user_id) {
             $response = new \Slim\Psr7\Response();
             $response->getBody()->write(json_encode([
                 'success' => false,
@@ -24,11 +24,11 @@ class AdminMiddleware implements MiddlewareInterface
                 ->withStatus(403);
         }
 
-        $user = \Illuminate\Database\Capsule\Manager::table('usuarios')
-            ->where('id', $usuario_id)
+        $user = \Illuminate\Database\Capsule\Manager::table('users')
+            ->where('id', $user_id)
             ->first();
 
-        if (!$user || $user->rol !== 'administrador') {
+        if (!$user || $user->role !== 'administrador') {
             $response = new \Slim\Psr7\Response();
             $response->getBody()->write(json_encode([
                 'success' => false,

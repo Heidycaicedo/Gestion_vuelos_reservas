@@ -4,45 +4,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Vuelos y Reservas</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="frontend/css/style.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Sistema de Gestión de Vuelos y Reservas</h1>
+            <h1>✈️ FlightHub</h1>
             <nav>
-                <button id="btnHome" class="nav-btn active">Inicio</button>
-                <button id="btnFlights" class="nav-btn">Vuelos</button>
-                <button id="btnReservations" class="nav-btn">Mis Reservas</button>
-                <button id="btnAdmin" class="nav-btn">Administración</button>
-                <button id="btnLogout" class="nav-btn logout">Cerrar Sesión</button>
+                <button id="btnHome" class="nav-btn active">🏠 Inicio</button>
+                <button id="btnFlights" class="nav-btn">✈️ Vuelos</button>
+                <button id="btnReservations" class="nav-btn">🎫 Mis Reservas</button>
+                <button id="btnAdmin" class="nav-btn">⚙️ Administración</button>
+                <button id="btnLogout" class="nav-btn logout">🚪 Cerrar Sesión</button>
             </nav>
         </header>
 
         <main>
             <section id="homeSection" class="section active">
-                <h2>Bienvenido</h2>
-                <p>Selecciona una opción del menú para continuar.</p>
+                <h2>Bienvenido al Sistema</h2>
+                <div class="welcome-grid">
+                    <div class="welcome-card">
+                        <div class="card-icon">✈️</div>
+                        <h3>Vuelos</h3>
+                        <p>Explora y reserva tus vuelos favoritos con solo un clic.</p>
+                        <button class="card-btn" onclick="document.getElementById('btnFlights').click()">Explorar Vuelos</button>
+                    </div>
+                    <div class="welcome-card">
+                        <div class="card-icon">🎫</div>
+                        <h3>Mis Reservas</h3>
+                        <p>Administra todas tus reservas en un solo lugar.</p>
+                        <button class="card-btn" onclick="document.getElementById('btnReservations').click()">Ver Reservas</button>
+                    </div>
+                    <div class="welcome-card">
+                        <div class="card-icon">⚙️</div>
+                        <h3>Administración</h3>
+                        <p>Gestiona usuarios y operaciones del sistema.</p>
+                        <button class="card-btn" onclick="document.getElementById('btnAdmin').click()">Ir al Panel</button>
+                    </div>
+                </div>
             </section>
 
             <section id="flightsSection" class="section">
-                <h2>Vuelos Disponibles</h2>
+                <h2>✈️ Vuelos Disponibles</h2>
                 <div id="flightsList" class="flights-grid">
                     <!-- Los vuelos se cargarán aquí -->
                 </div>
             </section>
 
             <section id="reservationsSection" class="section">
-                <h2>Mis Reservas</h2>
+                <h2>🎫 Mis Reservas</h2>
                 <div id="reservationsList" class="reservations-list">
                     <!-- Las reservas se cargarán aquí -->
                 </div>
             </section>
 
             <section id="adminSection" class="section">
-                <h2>Panel de Administración</h2>
+                <h2>⚙️ Panel de Administración</h2>
                 <div class="admin-panel">
-                    <h3>Gestión de Usuarios</h3>
+                    <h3>👥 Gestión de Usuarios</h3>
                     <div id="usersList" class="users-list">
                         <!-- Los usuarios se cargarán aquí -->
                     </div>
@@ -51,11 +70,33 @@
         </main>
 
         <footer>
-            <p>&copy; 2025 Sistema de Gestión de Vuelos y Reservas</p>
+            <p>© 2025 <strong>FlightHub</strong> - Sistema de Gestión de Vuelos y Reservas | Todos los derechos reservados</p>
         </footer>
     </div>
 
-    <script src="js/api.js"></script>
-    <script src="js/app.js"></script>
+    <script src="frontend/js/api.js"></script>
+    <script src="frontend/js/app.js"></script>
+    <!-- Debug banner: temporary - shows script load and auth status -->
+    <div id="debugBanner" style="position:fixed;right:12px;bottom:12px;padding:8px 12px;background:#fffae6;border:1px solid #ffd700;border-radius:6px;font-size:12px;color:#333;z-index:9999;box-shadow:0 2px 6px rgba(0,0,0,0.12);">Debug: initializing...</div>
+    <script>
+        (function(){
+            try{
+                console.log('Debug: scripts loaded');
+                var banner = document.getElementById('debugBanner');
+                var token = null;
+                var authenticated = false;
+                if (window.Auth && typeof Auth.getToken === 'function') {
+                    token = Auth.getToken();
+                    authenticated = !!token;
+                } else {
+                    console.log('Debug: Auth object not found');
+                }
+                banner.textContent = 'Debug — Auth present: ' + (window.Auth ? 'yes' : 'no') + ' | token: ' + (token ? 'yes' : 'no');
+                console.log('Debug: Auth present=', !!window.Auth, 'token=', token);
+            } catch (e) {
+                console.error('Debug script error', e);
+            }
+        })();
+    </script>
 </body>
 </html>
