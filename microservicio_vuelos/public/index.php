@@ -56,11 +56,15 @@ $notFoundHandler = function (Psr\Http\Message\ServerRequestInterface $request, T
 $errorMiddleware->setDefaultErrorHandler($defaultErrorHandler);
 $errorMiddleware->setErrorHandler(Slim\Exception\HttpNotFoundException::class, $notFoundHandler);
 
-// Rutas Públicas para listar vuelos
+// Rutas Públicas para listar vuelos y naves
 $app->get('/api/flights', \App\Controllers\FlightController::class . ':list');
+$app->get('/api/aircraft', \App\Controllers\AircraftController::class . ':list');
 
 // Rutas Protegidas
 $app->group('', function ($app) {
+    // Rutas accesibles para cualquier usuario autenticado (gestor/administrador)
+    $app->get('/api/flights/{id}', \App\Controllers\FlightController::class . ':show');
+    $app->get('/api/aircraft/{id}', \App\Controllers\AircraftController::class . ':show');
     // Rutas protegidas para gestores
     $app->group('', function ($app) {
         $app->post('/api/reservations', \App\Controllers\ReservationController::class . ':create');
@@ -69,13 +73,10 @@ $app->group('', function ($app) {
 
     // Rutas solo para Administrador
     $app->group('', function ($app) {
-        $app->get('/api/flights/{id}', \App\Controllers\FlightController::class . ':show');
         $app->post('/api/flights', \App\Controllers\FlightController::class . ':create');
         $app->put('/api/flights/{id}', \App\Controllers\FlightController::class . ':update');
         $app->delete('/api/flights/{id}', \App\Controllers\FlightController::class . ':delete');
 
-        $app->get('/api/aircraft', \App\Controllers\AircraftController::class . ':list');
-        $app->get('/api/aircraft/{id}', \App\Controllers\AircraftController::class . ':show');
         $app->post('/api/aircraft', \App\Controllers\AircraftController::class . ':create');
         $app->put('/api/aircraft/{id}', \App\Controllers\AircraftController::class . ':update');
         $app->delete('/api/aircraft/{id}', \App\Controllers\AircraftController::class . ':delete');

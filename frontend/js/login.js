@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (response && response.success) {
                 console.log('Login successful, token stored.');
+                console.log('Stored data in localStorage:', {
+                    token: localStorage.getItem('token'),
+                    user_id: localStorage.getItem('user_id'),
+                    role: localStorage.getItem('role')
+                });
                 // Redirigir al dashboard
                 window.location.href = 'index.html';
             } else {

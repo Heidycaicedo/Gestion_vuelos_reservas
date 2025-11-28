@@ -9,19 +9,25 @@
 <body>
     <div class="container">
         <header>
-            <h1>✈️ FlightHub</h1>
+            <div class="header-top">
+                <h1>✈️ Centro de Vuelos</h1>
+                <div id="roleBadge" class="role-badge" style="display:none;"></div>
+            </div>
             <nav>
                 <button id="btnHome" class="nav-btn active">🏠 Inicio</button>
-                <button id="btnFlights" class="nav-btn">✈️ Vuelos</button>
+                <button id="btnFlights" class="nav-btn">✈️ Vuelos Disponibles</button>
+                <button id="btnAircraft" class="nav-btn">🛩️ Naves Disponibles</button>
                 <button id="btnReservations" class="nav-btn">🎫 Mis Reservas</button>
-                <button id="btnAdmin" class="nav-btn">⚙️ Administración</button>
+                <button id="btnFlightManagement" class="nav-btn" style="display:none;">🛠️ Gestión de Vuelos</button>
+                <button id="btnAircraftManagement" class="nav-btn" style="display:none;">✈️ Gestión de Naves</button>
+                <button id="btnAdmin" class="nav-btn">⚙️ Gestión de Usuarios</button>
                 <button id="btnLogout" class="nav-btn logout">🚪 Cerrar Sesión</button>
             </nav>
         </header>
 
         <main>
             <section id="homeSection" class="section active">
-                <h2>Bienvenido al Sistema</h2>
+                <h2 id="welcomeTitle">Bienvenido al Sistema</h2>
                 <div class="welcome-grid">
                     <div class="welcome-card">
                         <div class="card-icon">✈️</div>
@@ -46,6 +52,27 @@
 
             <section id="flightsSection" class="section">
                 <h2>✈️ Vuelos Disponibles</h2>
+                <p class="section-subtitle">Explora y reserva tus vuelos favoritos. Aquí encontrarás todas las opciones disponibles.</p>
+                
+                <div class="search-flights-container">
+                    <div class="search-form">
+                        <div class="form-group">
+                            <label for="searchOrigin">Origen</label>
+                            <input type="text" id="searchOrigin" placeholder="ej: Bogotá, Medellín...">
+                        </div>
+                        <div class="form-group">
+                            <label for="searchDestination">Destino</label>
+                            <input type="text" id="searchDestination" placeholder="ej: Cali, Barranquilla...">
+                        </div>
+                        <div class="form-group">
+                            <label for="searchDeparture">Fecha de Salida</label>
+                            <input type="date" id="searchDeparture">
+                        </div>
+                        <button id="btnSearch" class="btn-submit" style="align-self: flex-end;">🔍 Buscar</button>
+                        <button id="btnClearSearch" class="btn-cancel" style="align-self: flex-end;">Limpiar</button>
+                    </div>
+                </div>
+
                 <div id="flightsList" class="flights-grid">
                     <!-- Los vuelos se cargarán aquí -->
                 </div>
@@ -53,50 +80,218 @@
 
             <section id="reservationsSection" class="section">
                 <h2>🎫 Mis Reservas</h2>
+                <p class="section-subtitle">Administra todas tus reservas en un solo lugar. Aquí puedes ver y cancelar tus reservas.</p>
                 <div id="reservationsList" class="reservations-list">
                     <!-- Las reservas se cargarán aquí -->
                 </div>
             </section>
 
-            <section id="adminSection" class="section">
-                <h2>⚙️ Panel de Administración</h2>
+            <section id="flightManagementSection" class="section">
+                <h2>🛠️ Gestión de Vuelos</h2>
+                <p class="section-subtitle">Panel de administración de vuelos. Crea, edita y elimina vuelos disponibles en el sistema.</p>
                 <div class="admin-panel">
-                    <h3>👥 Gestión de Usuarios</h3>
-                    <div id="usersList" class="users-list">
-                        <!-- Los usuarios se cargarán aquí -->
+                    <div class="admin-section">
+                        <button id="btnCreateFlight" class="btn-submit" style="margin-bottom: 20px; width: auto; padding: 10px 20px;">+ Crear Nuevo Vuelo</button>
+                        <div id="flightsManagementList" class="flights-management-list">
+                            <!-- Los vuelos se cargarán aquí para edición -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="aircraftManagementSection" class="section">
+                <h2>✈️ Gestión de Naves</h2>
+                <p class="section-subtitle">Panel de administración de naves. Crea, edita y elimina aeronaves disponibles en el sistema.</p>
+                <div class="admin-panel">
+                    <div class="admin-section">
+                        <button id="btnCreateAircraft" class="btn-submit" style="margin-bottom: 20px; width: auto; padding: 10px 20px;">+ Crear Nueva Nave</button>
+                        <div id="aircraftManagementList" class="aircraft-management-list">
+                            <!-- Las naves se cargarán aquí para edición -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="aircraftSection" class="section">
+                <h2>🛩️ Naves Disponibles</h2>
+                <p class="section-subtitle">Consulta todas las aeronaves disponibles en nuestro sistema. Información completa de cada nave con capacidad de pasajeros.</p>
+                
+                <div class="search-aircraft-container">
+                    <div class="search-form">
+                        <div class="form-group">
+                            <label for="searchAircraftName">Nombre de Nave</label>
+                            <input type="text" id="searchAircraftName" placeholder="ej: Boeing 737, Airbus A320...">
+                        </div>
+                        <div class="form-group">
+                            <label for="searchAircraftModel">Modelo</label>
+                            <input type="text" id="searchAircraftModel" placeholder="ej: 737-800, A380-800...">
+                        </div>
+                        <div class="form-group">
+                            <label for="searchAircraftCapacity">Capacidad Mínima</label>
+                            <input type="number" id="searchAircraftCapacity" placeholder="ej: 200" min="1">
+                        </div>
+                        <button id="btnSearchAircraft" class="btn-submit" style="align-self: flex-end;">🔍 Buscar</button>
+                        <button id="btnClearSearchAircraft" class="btn-cancel" style="align-self: flex-end;">Limpiar</button>
+                    </div>
+                </div>
+
+                <div id="aircraftList" class="aircraft-grid">
+                    <!-- Las naves se cargarán aquí -->
+                </div>
+            </section>
+
+            <section id="adminSection" class="section">
+                <h2>⚙️ Gestión de Usuarios</h2>
+                <p class="section-subtitle">Panel de administración. Gestiona usuarios del sistema.</p>
+                <div class="admin-panel">
+                    <div class="admin-section">
+                        <h3>👥 Gestión de Usuarios</h3>
+                        <button id="btnCreateUser" class="btn-submit" style="margin-bottom: 20px; width: auto; padding: 10px 20px;">+ Crear Nuevo Usuario</button>
+                        <div id="usersList" class="users-list">
+                            <!-- Los usuarios se cargarán aquí -->
+                        </div>
                     </div>
                 </div>
             </section>
         </main>
 
         <footer>
-            <p>© 2025 <strong>FlightHub</strong> - Sistema de Gestión de Vuelos y Reservas | Todos los derechos reservados</p>
+            <p>© 2025 <strong>Centro de Vuelos</strong> - Sistema de Gestión de Vuelos y Reservas | Todos los derechos reservados</p>
         </footer>
+    </div>
+
+    <!-- Modal para crear/editar vuelo -->
+    <div id="flightModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeFlightModal()">&times;</span>
+            <h2 id="flightModalTitle">Crear Nuevo Vuelo</h2>
+            <form id="flightForm" onsubmit="saveFlight(event)">
+                <input type="hidden" id="flightId" value="">
+                
+                <div class="form-group">
+                    <label for="naveSelect">Nave:</label>
+                    <select id="naveSelect" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        <option value="">-- Seleccionar una nave --</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="origin">Origen:</label>
+                    <input type="text" id="origin" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="destination">Destino:</label>
+                    <input type="text" id="destination" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="departure">Salida:</label>
+                    <input type="datetime-local" id="departure" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="arrival">Llegada:</label>
+                    <input type="datetime-local" id="arrival" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="price">Precio:</label>
+                    <input type="number" id="price" step="0.01" required>
+                </div>
+                
+                
+                <button type="submit" class="btn-submit">Guardar Vuelo</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar usuario -->
+    <div id="userModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeUserModal()">&times;</span>
+            <h2 id="userModalTitle">Crear Nuevo Usuario</h2>
+            <form id="userForm" onsubmit="saveUser(event)">
+                <input type="hidden" id="userId" value="">
+                
+                <div class="form-group">
+                    <label for="userName">Nombre Completo:</label>
+                    <input type="text" id="userName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userEmail">Correo Electrónico:</label>
+                    <input type="email" id="userEmail" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userPassword">Contraseña:</label>
+                    <input type="password" id="userPassword" required>
+                    <small id="passwordHint" style="display:none; color:#666;">Dejar vacío para no cambiar la contraseña</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userRole">Rol:</label>
+                    <select id="userRole" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                        <option value="gestor">Gestor</option>
+                        <option value="administrador">Administrador</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn-submit">Guardar Usuario</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar nave -->
+    <div id="aircraftModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeAircraftModal()">&times;</span>
+            <h2 id="aircraftModalTitle">Crear Nueva Nave</h2>
+            <form id="aircraftForm" onsubmit="saveAircraft(event)">
+                <input type="hidden" id="aircraftId" value="">
+                
+                <div class="form-group">
+                    <label for="aircraftName">Nombre:</label>
+                    <input type="text" id="aircraftName" placeholder="ej: Boeing 737" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="aircraftModel">Modelo:</label>
+                    <input type="text" id="aircraftModel" placeholder="ej: 737-800" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="aircraftCapacity">Capacidad (pasajeros):</label>
+                    <input type="number" id="aircraftCapacity" min="1" required>
+                </div>
+                
+                <button type="submit" class="btn-submit">Guardar Nave</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para confirmar reserva -->
+    <div id="reservationModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeReservationModal()">&times;</span>
+            <h2 id="reservationModalTitle">Confirmar Reserva</h2>
+            <div id="reservationDetails">
+                <p><strong>Vuelo:</strong> <span id="resFlightId"></span></p>
+                <p><strong>Ruta:</strong> <span id="resRoute"></span></p>
+                <p><strong>Salida:</strong> <span id="resDeparture"></span></p>
+                <p><strong>Precio:</strong> <span id="resPrice"></span></p>
+                <p id="resAircraftInfo"></p>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:12px;">
+                <button class="btn-cancel" onclick="closeReservationModal()">Cancelar</button>
+                <button class="btn-submit" id="confirmReservationBtn">Confirmar Reserva</button>
+            </div>
+        </div>
     </div>
 
     <script src="frontend/js/api.js"></script>
     <script src="frontend/js/app.js"></script>
-    <!-- Debug banner: temporary - shows script load and auth status -->
-    <div id="debugBanner" style="position:fixed;right:12px;bottom:12px;padding:8px 12px;background:#fffae6;border:1px solid #ffd700;border-radius:6px;font-size:12px;color:#333;z-index:9999;box-shadow:0 2px 6px rgba(0,0,0,0.12);">Debug: initializing...</div>
-    <script>
-        (function(){
-            try{
-                console.log('Debug: scripts loaded');
-                var banner = document.getElementById('debugBanner');
-                var token = null;
-                var authenticated = false;
-                if (window.Auth && typeof Auth.getToken === 'function') {
-                    token = Auth.getToken();
-                    authenticated = !!token;
-                } else {
-                    console.log('Debug: Auth object not found');
-                }
-                banner.textContent = 'Debug — Auth present: ' + (window.Auth ? 'yes' : 'no') + ' | token: ' + (token ? 'yes' : 'no');
-                console.log('Debug: Auth present=', !!window.Auth, 'token=', token);
-            } catch (e) {
-                console.error('Debug script error', e);
-            }
-        })();
-    </script>
 </body>
 </html>
+

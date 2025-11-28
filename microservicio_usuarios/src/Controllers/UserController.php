@@ -50,6 +50,48 @@ class UserController
         }
     }
 
+    public function create(Request $request, Response $response)
+    {
+        try {
+            $data = json_decode($request->getBody(), true);
+
+            // Validar campos requeridos
+            if (empty($data['name']) || empty($data['email']) || empty($data['password'])) {
+                return $this->errorResponse($response, 'Nombre, email y contraseña son requeridos', 400);
+            }
+
+            // Validar rol
+            $role = $data['role'] ?? 'gestor';
+            if (!in_array($role, ['administrador', 'gestor'])) {
+                return $this->errorResponse($response, 'Rol inválido', 400);
+            }
+
+            // Verificar si el email ya existe
+            $existingUser = User::where('email', $data['email'])->first();
+            if ($existingUser) {
+                return $this->errorResponse($response, 'El email ya está registrado', 409);
+            }
+
+            // Crear nuevo usuario
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => password_hash($data['password'], PASSWORD_BCRYPT),
+                'role' => $role,
+                'token' => null
+            ]);
+
+            // No exponer la contraseña
+            $userData = $user->toArray();
+            unset($userData['password']);
+            unset($userData['token']);
+
+            return $this->successResponse($response, $userData, 201);
+        } catch (\Exception $e) {
+            return $this->errorResponse($response, 'Error al crear usuario: ' . $e->getMessage(), 500);
+        }
+    }
+
     public function update(Request $request, Response $response, $args)
     {
         try {

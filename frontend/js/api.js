@@ -112,6 +112,10 @@ const Users = {
         return request(`${API_USUARIOS}/api/users/${id}`, 'GET');
     },
 
+    async create(data) {
+        return request(`${API_USUARIOS}/api/users`, 'POST', data);
+    },
+
     async update(id, data) {
         return request(`${API_USUARIOS}/api/users/${id}`, 'PUT', data);
     },

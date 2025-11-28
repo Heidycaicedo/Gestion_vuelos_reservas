@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Phase 3.5 Aircraft Association</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1200px; margin: 40px auto; padding: 20px; }
+        .test-section { border: 1px solid #ddd; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        h2 { color: #333; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #e7f3ff; color: #004085; }
+        pre { background: #f5f5f5; padding: 10px; overflow-x: auto; font-size: 12px; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; border: none; border-radius: 4px; background: #007bff; color: white; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test - Phase 3.5: Aircraft Association with Flights</h1>
+    
+    <div class="test-section">
+        <h2>1. Fetch All Flights</h2>
+        <button onclick="testFetchFlights()">Test Get Flights</button>
+        <div id="testFlightsResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Fetch All Aircraft</h2>
+        <button onclick="testFetchAircraft()">Test Get Aircraft</button>
+        <div id="testAircraftResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Create New Flight with Aircraft</h2>
+        <div style="margin: 10px 0;">
+            <label>Aircraft ID: <input type="number" id="aircraftId" min="1" value="1" style="width: 100px;"></label>
+            <label>Origin: <input type="text" id="flightOrigin" value="Nueva York" style="width: 150px;"></label>
+            <label>Destination: <input type="text" id="flightDestination" value="Los Angeles" style="width: 150px;"></label>
+            <label>Departure: <input type="datetime-local" id="flightDeparture" value="2025-12-20T10:00" style="width: 200px;"></label>
+            <label>Arrival: <input type="datetime-local" id="flightArrival" value="2025-12-20T13:00" style="width: 200px;"></label>
+            <label>Price: <input type="number" id="flightPrice" step="0.01" value="450000" style="width: 120px;"></label>
+        </div>
+        <button onclick="testCreateFlight()">Create Flight</button>
+        <div id="testCreateResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Verify Flight-Aircraft Association</h2>
+        <button onclick="testVerifyAssociation()">Verify Association</button>
+        <div id="testVerifyResult"></div>
+    </div>
+
+    <script>
+        const API_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDEiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0OjgwMDEiLCJpYXQiOjE3MzI3Mjk0MzYsImV4cCI6MTczMzMzNDIzNiwidXNlcl9pZCI6MSwiZW1haWwiOiJhZG1pbkBzeXN0ZW0uY29tIiwicm9sZSI6ImFkbWluaXN0cmFkb3IifQ.0q5VZ_wZswNFPmUdTqkqBGKvlX4o_dYfPo5rKx0KJ8U';
+        
+        async function request(url, method = 'GET', data = null) {
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_TOKEN}`
+                }
+            };
+            if (data) options.body = JSON.stringify(data);
+            
+            const response = await fetch(url, options);
+            return { ok: response.ok, status: response.status, data: await response.json() };
+        }
+
+        async function testFetchFlights() {
+            const result = document.getElementById('testFlightsResult');
+            result.innerHTML = '<div class="test-result info">Loading...</div>';
+            
+            try {
+                const res = await request('http://localhost:8002/api/flights');
+                if (res.ok) {
+                    const flights = res.data.data;
+                    result.innerHTML = `
+                        <div class="test-result success">✓ Successfully fetched ${flights.length} flight(s)</div>
+                        <pre>${JSON.stringify(flights, null, 2)}</pre>
+                    `;
+                } else {
+                    result.innerHTML = `<div class="test-result error">✗ Error: ${res.status}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="test-result error">✗ Connection error: ${error.message}</div>`;
+            }
+        }
+
+        async function testFetchAircraft() {
+            const result = document.getElementById('testAircraftResult');
+            result.innerHTML = '<div class="test-result info">Loading...</div>';
+            
+            try {
+                const res = await request('http://localhost:8002/api/aircraft');
+                if (res.ok) {
+                    const aircraft = res.data.data;
+                    result.innerHTML = `
+                        <div class="test-result success">✓ Successfully fetched ${aircraft.length} aircraft</div>
+                        <pre>${JSON.stringify(aircraft, null, 2)}</pre>
+                    `;
+                } else {
+                    result.innerHTML = `<div class="test-result error">✗ Error: ${res.status}</div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="test-result error">✗ Connection error: ${error.message}</div>`;
+            }
+        }
+
+        async function testCreateFlight() {
+            const result = document.getElementById('testCreateResult');
+            result.innerHTML = '<div class="test-result info">Creating flight...</div>';
+            
+            const data = {
+                nave_id: parseInt(document.getElementById('aircraftId').value),
+                origin: document.getElementById('flightOrigin').value,
+                destination: document.getElementById('flightDestination').value,
+                departure: document.getElementById('flightDeparture').value,
+                arrival: document.getElementById('flightArrival').value,
+                price: parseFloat(document.getElementById('flightPrice').value)
+            };
+            
+            try {
+                const res = await request('http://localhost:8002/api/flights', 'POST', data);
+                if (res.ok) {
+                    const flight = res.data.data;
+                    result.innerHTML = `
+                        <div class="test-result success">✓ Flight created successfully (ID: ${flight.id})</div>
+                        <pre>${JSON.stringify(flight, null, 2)}</pre>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="test-result error">✗ Error: ${res.status}</div>
+                        <pre>${JSON.stringify(res.data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="test-result error">✗ Connection error: ${error.message}</div>`;
+            }
+        }
+
+        async function testVerifyAssociation() {
+            const result = document.getElementById('testVerifyResult');
+            result.innerHTML = '<div class="test-result info">Verifying associations...</div>';
+            
+            try {
+                const flightsRes = await request('http://localhost:8002/api/flights');
+                const aircraftRes = await request('http://localhost:8002/api/aircraft');
+                
+                if (flightsRes.ok && aircraftRes.ok) {
+                    const flights = flightsRes.data.data;
+                    const aircraft = aircraftRes.data.data;
+                    const aircraftMap = {};
+                    
+                    aircraft.forEach(a => { aircraftMap[a.id] = a; });
+                    
+                    let html = '<div class="test-result success">✓ Association verification:</div>';
+                    html += '<table style="width: 100%; border-collapse: collapse;">';
+                    html += '<tr style="background: #f5f5f5;"><th style="border: 1px solid #ddd; padding: 8px;">Flight ID</th><th style="border: 1px solid #ddd; padding: 8px;">Nave ID</th><th style="border: 1px solid #ddd; padding: 8px;">Aircraft Name</th><th style="border: 1px solid #ddd; padding: 8px;">Model</th><th style="border: 1px solid #ddd; padding: 8px;">Route</th></tr>';
+                    
+                    flights.forEach(f => {
+                        const a = aircraftMap[f.nave_id];
+                        const status = a ? '✓' : '✗';
+                        html += `<tr><td style="border: 1px solid #ddd; padding: 8px;">#${f.id}</td><td style="border: 1px solid #ddd; padding: 8px;">${f.nave_id}</td><td style="border: 1px solid #ddd; padding: 8px;">${status} ${a ? a.name : 'MISSING'}</td><td style="border: 1px solid #ddd; padding: 8px;">${a ? a.model : '-'}</td><td style="border: 1px solid #ddd; padding: 8px;">${f.origin} → ${f.destination}</td></tr>`;
+                    });
+                    
+                    html += '</table>';
+                    result.innerHTML = html;
+                } else {
+                    result.innerHTML = '<div class="test-result error">✗ Failed to fetch data</div>';
+                }
+            } catch (error) {
+                result.innerHTML = `<div class="test-result error">✗ Connection error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -22,12 +22,33 @@ body {
 }
 
 header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 25px 30px;
-    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* DEFAULT THEME - Morado */
+body header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3) !important;
+}
+
+/* ADMIN THEME - Rojo */
+body.admin-theme header {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+    box-shadow: 0 5px 20px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* GESTOR THEME - Verde */
+body.gestor-theme header {
+    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%) !important;
+    box-shadow: 0 5px 20px rgba(168, 85, 247, 0.3) !important;
 }
 
 header::before {
@@ -47,6 +68,34 @@ header h1 {
     font-weight: 700;
     position: relative;
     z-index: 1;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+.header-top h1 {
+    margin-bottom: 0;
+}
+
+.role-badge {
+    background: rgba(255,255,255,0.3);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: inline-block;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 nav {
@@ -191,11 +240,33 @@ main {
     font-weight: 700;
 }
 
+.section-subtitle {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
 .flights-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 24px;
     margin-top: 20px;
+}
+
+.search-flights-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.search-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    align-items: flex-end;
 }
 
 .flight-card {
@@ -243,6 +314,74 @@ main {
     margin-top: 16px;
 }
 
+/* Aircraft Grid Styles */
+.aircraft-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.search-aircraft-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.aircraft-card {
+    border: none;
+    border-radius: 12px;
+    padding: 24px;
+    background: linear-gradient(135deg, #fff4e6 0%, #ffe8cc 100%);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.aircraft-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.aircraft-card:hover::before {
+    left: 100%;
+}
+
+.aircraft-card:hover {
+    box-shadow: 0 15px 40px rgba(255, 159, 64, 0.25);
+    transform: translateY(-8px);
+    background: linear-gradient(135deg, #fffbf0 0%, #fff9f0 100%);
+}
+
+.aircraft-card h3 {
+    color: #ff9f40;
+    margin-bottom: 16px;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.aircraft-info {
+    margin: 12px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.aircraft-info label {
+    font-weight: 600;
+
 .reservation-item > div:first-child,
 .user-item > div:first-child {
     flex: 1;
@@ -250,13 +389,15 @@ main {
 
 .reservation-item button,
 .user-item button {
-    padding: 10px 16px;
+    padding: 2px 8px;
     border: none;
-    border-radius: 6px;
+    border-radius: 4px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    font-size: 11px;
+    height: 24px;
 }
 
 .flight-info {
@@ -451,6 +592,29 @@ footer {
     transform: translateY(0);
 }
 
+.btn-cancel {
+    padding: 4px 10px;
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 24px;
+    white-space: nowrap;
+}
+
+.btn-cancel:hover {
+    background-color: #c9302c;
+    transform: translateY(-1px);
+}
+
+.btn-cancel:active {
+    transform: translateY(0);
+}
+
 .error-message {
     color: #ef4444;
     font-size: 14px;
@@ -508,6 +672,80 @@ footer {
     margin-top: auto;
 }
 
+/* ===== TEMAS CON !important ===== */
+
+/* ADMIN THEME */
+body.admin-theme .section h2 {
+    color: #3b82f6 !important;
+    border-bottom-color: #3b82f6 !important;
+}
+
+body.admin-theme #welcomeTitle {
+    color: #3b82f6 !important;
+    border-bottom-color: #3b82f6 !important;
+}
+
+body.admin-theme .welcome-card h3,
+body.admin-theme .flight-card h3 {
+    color: #3b82f6 !important;
+}
+
+body.admin-theme .flight-info label {
+    color: #3b82f6 !important;
+}
+
+body.admin-theme .reservation-item strong,
+body.admin-theme .user-item strong {
+    color: #3b82f6 !important;
+}
+
+body.admin-theme .card-btn,
+body.admin-theme .btn-submit {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+}
+
+body.admin-theme .role-badge {
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%) !important;
+    color: white !important;
+}
+
+/* GESTOR THEME */
+body.gestor-theme .section h2 {
+    color: #a855f7 !important;
+    border-bottom-color: #a855f7 !important;
+}
+
+body.gestor-theme #welcomeTitle {
+    color: #a855f7 !important;
+    border-bottom-color: #a855f7 !important;
+}
+
+body.gestor-theme .welcome-card h3,
+body.gestor-theme .flight-card h3 {
+    color: #a855f7 !important;
+}
+
+body.gestor-theme .flight-info label {
+    color: #a855f7 !important;
+}
+
+body.gestor-theme .reservation-item strong,
+body.gestor-theme .user-item strong {
+    color: #a855f7 !important;
+}
+
+body.gestor-theme .card-btn,
+body.gestor-theme .btn-submit {
+    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%) !important;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3) !important;
+}
+
+body.gestor-theme .role-badge {
+    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%) !important;
+    color: white !important;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     nav {
@@ -534,6 +772,17 @@ footer {
         font-size: 24px;
     }
 
+    .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .role-badge {
+        width: 100%;
+        text-align: center;
+    }
+
     .login-box {
         padding: 30px;
         margin: 20px;
@@ -542,4 +791,131 @@ footer {
     .section h2 {
         font-size: 22px;
     }
+}
+
+/* Modal styles */
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #999;
+}
+
+.close:hover {
+    color: #000;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+}
+
+.admin-section {
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-section:last-child {
+    border-bottom: none;
+}
+
+.flights-management-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.flight-management-item {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flight-management-item div {
+    flex: 1;
+}
+
+.flight-management-item button {
+    margin-left: 10px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-edit {
+    background-color: #667eea;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #5568d3;
+}
+
+.btn-delete {
+    background-color: #dc2626;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #c9302c;
+}
 }

@@ -26,10 +26,19 @@ class ReservationController
         try {
             $queryParams = $request->getQueryParams();
             $userId = $queryParams['user_id'] ?? null;
+            $currentUserId = $request->getAttribute('user_id');
+            $userRole = \Illuminate\Database\Capsule\Manager::table('users')
+                ->where('id', $currentUserId)
+                ->pluck('role')
+                ->first();
 
             $query = Reservation::query();
 
-            if ($userId) {
+            // If not admin, can only see own reservations
+            if ($userRole !== 'administrador') {
+                $query->where('user_id', $currentUserId);
+            } elseif ($userId) {
+                // Admin can filter by specific user
                 $query->where('user_id', $userId);
             }
 
@@ -95,9 +104,19 @@ class ReservationController
     {
         try {
             $reservation = Reservation::find($args['id']);
+            $currentUserId = $request->getAttribute('user_id');
+            $userRole = \Illuminate\Database\Capsule\Manager::table('users')
+                ->where('id', $currentUserId)
+                ->pluck('role')
+                ->first();
 
             if (!$reservation) {
                 return $this->errorResponse($response, 'Reserva no encontrada', 404);
+            }
+
+            // Check ownership: only owner or admin can cancel
+            if ($reservation->user_id !== $currentUserId && $userRole !== 'administrador') {
+                return $this->errorResponse($response, 'No tienes permiso para cancelar esta reserva', 403);
             }
 
             if ($reservation->status !== 'activa') {

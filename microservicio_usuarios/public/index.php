@@ -93,6 +93,10 @@ $app->group('', function ($app) {
             $controller = new UserController();
             return $controller->show($request, $response, $args);
         });
+        $app->post('/api/users', function (Request $request, Response $response) {
+            $controller = new UserController();
+            return $controller->create($request, $response);
+        });
         $app->put('/api/users/{id}', function (Request $request, Response $response, array $args) {
             $controller = new UserController();
             return $controller->update($request, $response, $args);
