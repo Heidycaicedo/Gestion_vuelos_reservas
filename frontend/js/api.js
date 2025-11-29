@@ -1,6 +1,7 @@
 // Configuración de URLs de los microservicios
-const API_USUARIOS = 'http://localhost:8001';
-const API_VUELOS = 'http://localhost:8002';
+// Detecta automáticamente el servidor (localhost o IP remota)
+const API_USUARIOS = `http://${window.location.hostname}:8001`;
+const API_VUELOS = `http://${window.location.hostname}:8002`;
 
 // Funciones auxiliares para hacer requests
 async function request(url, method = 'GET', data = null) {
